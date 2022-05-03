@@ -2,13 +2,18 @@ import React, { useState, useEffect } from 'react';
 import {
     Card, Table, Radio, Button, Modal, Form, Input, Checkbox
 } from 'antd';
-import { storage, addData } from '../../chrome';
+import { storage, addData, getCookie } from '../../chrome';
+import './view.scss';
 
 const { Item: FormItem, useForm } = Form;
 const { Group } = Checkbox;
 
-const columns01 = [{ title: '账户名称', dataIndex: 'name' }, { title: '账号', dataIndex: 'account' }, { title: '权限', dataIndex: 'per', render: (val) => val.join(',') }];
-const columns02 = [{ title: '权限名称', dataIndex: 'name' }, { title: '权限描述' }];
+const columns01 = [{ title: '账户名称', dataIndex: 'name' }, { title: '账号', dataIndex: 'account' }, { title: '权限', dataIndex: 'per', render: (val) => (val ? val.join(',') : '') }];
+const columns02 = [{ title: '权限名称', dataIndex: 'name' }, { title: '权限描述', dataIndex: 'desc' }];
+const formItemLayout = {
+    labelCol: { span: 4 },
+    wrapperCol: { span: 16 }
+};
 
 function Manager() {
     const [activeTab, setActiveTab] = useState('user');
@@ -18,11 +23,12 @@ function Manager() {
     const [userForm] = useForm();
     const [persForm] = useForm();
 
-    const obj2Arr = (obj) => Object.entries(obj).reduce((prev, [k, v]) => [...prev, { name: k, ...v }]);
+    const obj2Arr = (obj) => Object.entries(obj).reduce((prev, [k, v]) => [...prev, { name: k, ...v }], []);
 
-    useEffect(() => {
-        const user = storage.get('users');
-        const permission = storage.get('permission');
+    useEffect(async () => {
+        const user = await storage.get('users');
+        const permission = await storage.get('permission');
+        console.log(user, permission);
         if (user) {
             setUsers(obj2Arr(user));
         }
@@ -31,12 +37,17 @@ function Manager() {
         }
     }, []);
 
+    const closeModal = () => {
+        setModalVisible('');
+    };
+
     const saveUser = () => {
         userForm.validateFields().then(() => {
             const formData = userForm.getFieldsValue();
             const { name, ...rest } = formData;
-            setUsers((prev) => [...prev, { formData }]);
+            setUsers((prev) => [...prev, formData]);
             addData(name, rest);
+            closeModal();
         });
     };
 
@@ -44,15 +55,20 @@ function Manager() {
         persForm.validateFields().then(() => {
             const formData = persForm.getFieldsValue();
             const { name, ...rest } = formData;
-            setPers((prev) => [...prev, { formData }]);
+            setPers((prev) => [...prev, formData]);
             addData(name, rest, 'permission');
+            closeModal();
         });
+    };
+
+    const importCookie = () => {
+
     };
 
     return (
         <div className={`${WRAPPER_CLASS_NAME}`}>
             <div className="row-1">
-                <Button onClick={() => setModalVisible('user')}>新建用户</Button>
+                <Button onClick={() => setModalVisible('user')} type="primary">新建用户</Button>
                 <Button onClick={() => setModalVisible('pers')}>新建权限</Button>
             </div>
             <Radio.Group
@@ -69,42 +85,37 @@ function Manager() {
             {activeTab === 'user' ? <Table columns={columns01} dataSource={users} />
                 : <Table columns={columns02} dataSource={pers} />}
 
-            {modalVisible === 'user' && (
-                <Modal title="新建用户">
-                    <Form form={userForm}>
-                        <FormItem label="账户名称" name="name" rules={[{ required: true }]}>
-                            <Input />
-                        </FormItem>
-                        <FormItem label="账号" name="account">
-                            <Input />
-                        </FormItem>
-                        <FormItem label="权限">
+            <Modal title="新建用户" visible={modalVisible === 'user'} wrapClassName={`${WRAPPER_CLASS_NAME}`} onCancel={closeModal} onOk={saveUser}>
+                <Form form={userForm} {...formItemLayout} initialValues={{ per: [] }}>
+                    <FormItem label="账户名称" name="name" rules={[{ required: true }]}>
+                        <Input />
+                    </FormItem>
+                    <FormItem label="账号" name="account">
+                        <Input />
+                    </FormItem>
+                    <FormItem label="权限" name="per">
+                        {pers.length ? (
                             <Group>
-                                {pers.map(({ name, value }) => (<Checkbox value={value}>{name}</Checkbox>))}
+                                {pers.map(({ name }, index) => (<Checkbox value={name} key={index}>{name}</Checkbox>))}
                             </Group>
-                        </FormItem>
-                        <FormItem>
-                            <Button onClick={saveUser}>保存</Button>
-                        </FormItem>
-                    </Form>
-                </Modal>
-            )}
+                        ) : '暂无权限，请新建'}
+                    </FormItem>
+                    <FormItem>
+                        <Button size="small" onClick={importCookie}>导入当前用户cookie</Button>
+                    </FormItem>
+                </Form>
+            </Modal>
 
-            {modalVisible === 'pers' && (
-                <Modal title="新建权限">
-                    <Form form={userForm}>
-                        <FormItem label="权限名称" name="name" rules={[{ required: true }]}>
-                            <Input />
-                        </FormItem>
-                        <FormItem label="权限描述" name="desc">
-                            <Input />
-                        </FormItem>
-                        <FormItem>
-                            <Button onClick={savePermission}>保存</Button>
-                        </FormItem>
-                    </Form>
-                </Modal>
-            )}
+            <Modal title="新建权限" visible={modalVisible === 'pers'} wrapClassName={`${WRAPPER_CLASS_NAME}`} onCancel={closeModal} onOk={savePermission}>
+                <Form form={persForm} {...formItemLayout}>
+                    <FormItem label="权限名称" name="name" rules={[{ required: true }]}>
+                        <Input />
+                    </FormItem>
+                    <FormItem label="权限描述" name="desc">
+                        <Input />
+                    </FormItem>
+                </Form>
+            </Modal>
         </div>
     );
 }
