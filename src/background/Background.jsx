@@ -1,5 +1,5 @@
 import {
-    create, parentClient, ChromeMessage, reload
+    create, parentClient, ChromeMessage, contentClient, reload, getCookie
 } from '../chrome';
 
 export default class Background {
@@ -18,15 +18,18 @@ export default class Background {
             id: 'demo',
             title: '演示右键功能',
             onclick: () => {
-                parentClient.seedMessage(new ChromeMessage('show drawer'));
+                parentClient.sendMessage(new ChromeMessage('set cookie'));
             }
         });
     }
 
     // 初始化消息通道
     initMessageClient() {
-        parentClient.listen('test connect', (res, sendResponse) => {
-            sendResponse(new ChromeMessage('connect success'));
+        contentClient.listen('set-cookie', (res, sendResponse) => {
+            console.log(res, 'res');
+            window.currentUserCookie = res.params;
+            window.test = 999;
+            sendResponse(new ChromeMessage('set cookie success'));
         });
     }
 }

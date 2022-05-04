@@ -1,5 +1,7 @@
 import * as storage from './storage';
-import { parentClient, contentClient, ChromeMessage } from './message';
+import {
+    getBgWindow, parentClient, contentClient, ChromeMessage,listeners
+} from './message';
 import { create } from './contextMenus';
 import { go } from './history';
 import { reload } from './runtime';
@@ -11,6 +13,8 @@ export {
     ChromeMessage,
     create,
     go,
-    reload
+    reload,
+    getBgWindow,listeners
 };
 export * from './cookies';
+export * from './page';

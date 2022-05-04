@@ -5,7 +5,7 @@ eventSource.addEventListener('compiled successfully', () => {
     // eslint-disable-next-line no-undef
     chrome.tabs.query({ active: true }, async (tabs) => {
         if (tabs.length > 0) {
-            const res = await parentClient.seedMessage(new ChromeMessage('refresh page'));
+            const res = await parentClient.sendMessage(new ChromeMessage('refresh page'));
             if (res) {
                 reload();
             }

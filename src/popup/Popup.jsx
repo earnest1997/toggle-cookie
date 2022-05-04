@@ -4,7 +4,9 @@ import {
 } from 'antd';
 import { ExportOutlined, ImportOutlined } from '@ant-design/icons';
 import './Popup.scss';
-import { go, storage, toggleUser } from '../chrome';
+import {
+    go, storage, toggleUser, getCookie, contentClient, ChromeMessage, getPageInfo
+} from '../chrome';
 
 const { Panel } = Collapse;
 
@@ -40,8 +42,13 @@ export default class Popup extends Component {
         go('../html/view.html');
     }
 
-    toggleUser(index) {
+    async toggleUser(index, name) {
+        const tab = await getPageInfo();
+        const { url, id } = tab;
+        console.log(index, name, 99);
         this.state.activeIndex = index;
+        const domain = new URL(url).host;
+        toggleUser({ name, domain, url });
     }
 
     renderEmpty() {
@@ -52,17 +59,35 @@ export default class Popup extends Component {
         );
     }
 
+    async setCookie() {
+        const tab = await getPageInfo();
+        const { url } = tab;
+        const currentUserCookie = await getCookie(url);
+        const res = await contentClient.sendMessage(new ChromeMessage('set-cookie', currentUserCookie));
+        console.log(currentUserCookie, res, tab);
+        // chrome.tabs.query({
+        //     currentWindow: true,
+        //     active: true
+        // }, async (tabs) => {
+        //     console.log(tabs, 88);
+        //     const tab = tabs[0];
+
+        // });
+    }
+
     async componentDidMount() {
+        const tab = await getPageInfo();
+        console.log(tab.url, 88, tab.id);
         const users = await storage.get('users');
-        console.log(users, 99);
         this.setState({ list: obj2Arr(users || {}) });
+        this.setCookie();
     }
 
     // eslint-disable-next-line react/require-render-return
     render() {
         const list = this.state.list.map(({ name, per }, index) => {
             const active = this.state.activeIndex === index;
-            let btn = <Button type="link" onClick={() => this.toggleUser(index)}>切换</Button>;
+            let btn = <Button type="link" onClick={(e) => { e.nativeEvent.stopImmediatePropagation(); this.toggleUser(index, name); }}>切换</Button>;
             btn = active ? React.cloneElement(btn, { disabled: true, className: 'disable' }) : btn;
             return (
                 <Panel

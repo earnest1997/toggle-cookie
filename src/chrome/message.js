@@ -34,7 +34,7 @@ function dispatchEvent(request, sendResponse) {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const success = dispatchEvent(request, sendResponse);
-
+    //    监听回调函数实参形参一致即调用成功
     if (!success) {
         sendResponse(new ChromeMessage('Default Response'));
     }
@@ -48,7 +48,7 @@ class ContentClient {
         listeners[msg] = callBack;
     }
 
-    seedMessage(message) {
+    sendMessage(message) {
         return new Promise((resolve) => {
             chrome.runtime.sendMessage(message, (res) => {
                 resolve(res);
@@ -57,15 +57,15 @@ class ContentClient {
     }
 }
 
-// background 或者 popup发送和监听消息
+// background 或者 popup向content发送和监听消息
 class ParentClient {
     listen(msg, callBack) {
         listeners[msg] = callBack;
     }
 
-    seedMessage(message) {
+    sendMessage(message) {
         return new Promise((resolve) => {
-            chrome.tabs.query({ active: true }, (tabs) => {
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
                 chrome.tabs.sendMessage(tabs[0].id, message, (response) => {
                     resolve(response);
                 });
@@ -76,5 +76,8 @@ class ParentClient {
 
 const contentClient = new ContentClient();
 const parentClient = new ParentClient();
+const getBgWindow = () => chrome.extension.getBackgroundPage();
 
-export { contentClient, parentClient, ChromeMessage };
+export {
+    contentClient, parentClient, ChromeMessage, getBgWindow, listeners
+};

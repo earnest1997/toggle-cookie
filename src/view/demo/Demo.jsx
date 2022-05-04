@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import {
-    Card, Table, Radio, Button, Modal, Form, Input, Checkbox
+    Card, Table, Radio, Button, Modal, Form, Input, Checkbox, message
 } from 'antd';
-import { storage, addData, getCookie } from '../../chrome';
+import { storage, addData, getBgWindow } from '../../chrome';
 import './view.scss';
 
 const { Item: FormItem, useForm } = Form;
@@ -20,6 +20,7 @@ function Manager() {
     const [users, setUsers] = useState([]);
     const [pers, setPers] = useState([]);
     const [modalVisible, setModalVisible] = useState('');
+    const [isSetCookie, setCookieStatus] = useState();
     const [userForm] = useForm();
     const [persForm] = useForm();
 
@@ -62,60 +63,72 @@ function Manager() {
     };
 
     const importCookie = () => {
-
+        const bgWindow = getBgWindow();
+        console.log(bgWindow.currentUserCookie, bgWindow.url, 'window', bgWindow.test);
+        const cookie = getBgWindow().currentUserCookie;
+        if (!cookie) {
+            message.error('无法获取当前用户cookie，请确定是否登录');
+            return;
+        }
+        console.log(cookie, 99);
+        userForm.setFieldsValue({ cookie });
+        setCookieStatus(true);
     };
 
     return (
         <div className={`${WRAPPER_CLASS_NAME}`}>
-            <div className="row-1">
-                <Button onClick={() => setModalVisible('user')} type="primary">新建用户</Button>
-                <Button onClick={() => setModalVisible('pers')}>新建权限</Button>
-            </div>
-            <Radio.Group
-                onChange={({ target: { value } }) => {
-                    setActiveTab(value);
-                }}
-                value={activeTab}
-            >
-                <Radio value="user">用户管理</Radio>
-                <Radio value="permission">权限管理</Radio>
+            <main>
+                <div className="row-1">
+                    <Button onClick={() => setModalVisible('user')} type="primary">新建用户</Button>
+                    <Button onClick={() => setModalVisible('pers')}>新建权限</Button>
+                </div>
+                <Radio.Group
+                    onChange={({ target: { value } }) => {
+                        setActiveTab(value);
+                    }}
+                    value={activeTab}
+                >
+                    <Radio value="user">用户管理</Radio>
+                    <Radio value="permission">权限管理</Radio>
 
-            </Radio.Group>
+                </Radio.Group>
 
-            {activeTab === 'user' ? <Table columns={columns01} dataSource={users} />
-                : <Table columns={columns02} dataSource={pers} />}
+                {activeTab === 'user' ? <Table columns={columns01} dataSource={users} />
+                    : <Table columns={columns02} dataSource={pers} />}
 
-            <Modal title="新建用户" visible={modalVisible === 'user'} wrapClassName={`${WRAPPER_CLASS_NAME}`} onCancel={closeModal} onOk={saveUser}>
-                <Form form={userForm} {...formItemLayout} initialValues={{ per: [] }}>
-                    <FormItem label="账户名称" name="name" rules={[{ required: true }]}>
-                        <Input />
-                    </FormItem>
-                    <FormItem label="账号" name="account">
-                        <Input />
-                    </FormItem>
-                    <FormItem label="权限" name="per">
-                        {pers.length ? (
-                            <Group>
-                                {pers.map(({ name }, index) => (<Checkbox value={name} key={index}>{name}</Checkbox>))}
-                            </Group>
-                        ) : '暂无权限，请新建'}
-                    </FormItem>
-                    <FormItem>
-                        <Button size="small" onClick={importCookie}>导入当前用户cookie</Button>
-                    </FormItem>
-                </Form>
-            </Modal>
+                <Modal title="新建用户" centered visible={modalVisible === 'user'} wrapClassName={`${WRAPPER_CLASS_NAME}`} onCancel={closeModal} onOk={saveUser}>
+                    <Form form={userForm} {...formItemLayout} initialValues={{ per: [] }}>
+                        <FormItem label="账户名称" name="name" rules={[{ required: true }]}>
+                            <Input />
+                        </FormItem>
+                        <FormItem label="账号" name="account">
+                            <Input />
+                        </FormItem>
+                        <FormItem label="权限" name="per">
+                            {pers.length ? (
+                                <Group>
+                                    {pers.map(({ name }, index) => (<Checkbox value={name} key={index}>{name}</Checkbox>))}
+                                </Group>
+                            ) : '暂无权限，请新建'}
+                        </FormItem>
+                        <FormItem name="cookie" rules={[{ required: true }]} label="cookie">
+                            <Button size="small" onClick={importCookie} {...isSetCookie && { className: 'disabled' }} type="primary">导入当前用户cookie</Button>
+                            {isSetCookie && <span>已导入</span>}
+                        </FormItem>
+                    </Form>
+                </Modal>
 
-            <Modal title="新建权限" visible={modalVisible === 'pers'} wrapClassName={`${WRAPPER_CLASS_NAME}`} onCancel={closeModal} onOk={savePermission}>
-                <Form form={persForm} {...formItemLayout}>
-                    <FormItem label="权限名称" name="name" rules={[{ required: true }]}>
-                        <Input />
-                    </FormItem>
-                    <FormItem label="权限描述" name="desc">
-                        <Input />
-                    </FormItem>
-                </Form>
-            </Modal>
+                <Modal centered title="新建权限" visible={modalVisible === 'pers'} wrapClassName={`${WRAPPER_CLASS_NAME}`} onCancel={closeModal} onOk={savePermission}>
+                    <Form form={persForm} {...formItemLayout}>
+                        <FormItem label="权限名称" name="name" rules={[{ required: true }]}>
+                            <Input />
+                        </FormItem>
+                        <FormItem label="权限描述" name="desc">
+                            <Input />
+                        </FormItem>
+                    </Form>
+                </Modal>
+            </main>
         </div>
     );
 }

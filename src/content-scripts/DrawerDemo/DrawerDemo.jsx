@@ -13,7 +13,7 @@ export default class DrawerDemo extends Component {
 
     // Background 通讯
     async sendMsgToBackground() {
-        const res = await contentClient.seedMessage(new ChromeMessage('test connect'));
+        const res = await contentClient.sendMessage(new ChromeMessage('test connect'));
 
         this.setState({
             messageFromBg: res.msg

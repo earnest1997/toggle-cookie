@@ -1,16 +1,21 @@
 import * as storage from './storage';
-import { parentClient } from './message';
+import { parentClient, ChromeMessage } from './message';
 
-function getCookie() {
+function getCookie(url) {
     return new Promise((resolve) => {
-        chrome.cookies.getAll({ domain: document.domain }, (cookies) => {
+        chrome.cookies.getAll({ url }, (cookies) => {
             resolve(cookies);
         });
     });
 }
 
 function setCookie(val) {
-    chrome.cookies.set(val);
+    console.log(val, 8899);
+    chrome.cookies.set(val, (cookie) => {
+        console.log(JSON.stringify(cookie));
+        console.log(chrome.extension.lastError);
+        console.log(chrome.runtime.lastError);
+    });
 }
 
 function removeCookie() {
@@ -29,18 +34,25 @@ async function removeData(name, key = 'users') {
     storage.set(key, users);
 }
 
-async function toggleUser(name) {
-    const cookies = await storage.get('user') || {};
-    const cookie = cookies[name];
-    cookie.forEach((item) => {
+async function toggleUser({ name, domain: currentPageDomain, url }) {
+    const data = await storage.get('users') || {};
+    const detail = data[name];
+    const cookie = detail.cookie || [];
+    const parentCookie = [];
+    cookie.forEach(({ hostOnly, session, ...item }) => {
         const { domain } = item;
-        const isParentDomain = domain !== document.domain;
-        if (!isParentDomain) {
+        item.url = url;
+        const isParentDomain = domain !== currentPageDomain;
+        if (isParentDomain) {
             setCookie(item);
         } else {
-            parentClient.sendMessage('set-cookie', item);
+            parentCookie.push(item);
         }
     });
+    console.log(parentCookie, 'parentcookie');
+    // if (parentCookie.length) {
+    parentClient.sendMessage(new ChromeMessage('set-parent-cookie', parentCookie));
+    // }
 }
 
 export {
