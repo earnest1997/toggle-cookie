@@ -11,6 +11,7 @@ function ReloadServer(app) {
 
         const reloadPlugin = () => {
             if (!closed) {
+                // sse不需要双向通讯
                 sseStream.write(
                     {
                         event: 'compiled successfully',

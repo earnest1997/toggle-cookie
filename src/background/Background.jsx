@@ -1,5 +1,5 @@
 import {
-    create, parentClient, ChromeMessage, contentClient, reload, getCookie
+    create, parentClient, ChromeMessage, contentClient
 } from '../chrome';
 
 export default class Background {

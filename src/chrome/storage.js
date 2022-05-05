@@ -1,18 +1,30 @@
 /* eslint-disable no-undef */
-function set(key, value) {
-    return new Promise((resolve) => {
-        chrome.storage.sync.set({ [key]: value }, () => {
-            resolve(value);
-        });
-    });
-}
+import { getPageInfo } from './page';
 
-function get(key) {
-    return new Promise((resolve) => {
-        chrome.storage.sync.get(key, (result) => {
-            resolve(result[key] || {});
-        });
-    });
-}
+export const storage = new (class Storage {
+    constructor() {
+        this.siteDomain = '';
+        this.init();
+    }
 
-export { set, get };
+    async init() {
+        const { domain } = await getPageInfo();
+        this.siteDomain = domain;
+    }
+
+    set(key, value) {
+        return new Promise((resolve) => {
+            chrome.storage.sync.set({ [`${this.siteDomain}-${key}`]: value }, () => {
+                resolve(value);
+            });
+        });
+    }
+
+    get(key) {
+        return new Promise((resolve) => {
+            chrome.storage.sync.get(`${this.siteDomain}-${key}`, (result) => {
+                resolve(result[`${this.siteDomain}-${key}`] || {});
+            });
+        });
+    }
+})();

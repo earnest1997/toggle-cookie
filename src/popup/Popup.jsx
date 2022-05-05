@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {
     Avatar, Empty, Button, Collapse, Tooltip
 } from 'antd';
-import { ExportOutlined, ImportOutlined } from '@ant-design/icons';
+import { ExportOutlined, ImportOutlined, RightOutlined } from '@ant-design/icons';
 import './Popup.scss';
 import {
     go, storage, toggleUser, getCookie, contentClient, ChromeMessage, getPageInfo
@@ -12,14 +12,14 @@ const { Panel } = Collapse;
 
 function Toolbar() {
     return (
-        <>
-            <Tooltip title="导出配置">
+        <div className="toolbar">
+            <span title="导出配置">
                 <ExportOutlined />
-            </Tooltip>
-            <Tooltip title="导入配置">
+            </span>
+            <span title="导入配置">
                 <ImportOutlined />
-            </Tooltip>
-        </>
+            </span>
+        </div>
     );
 }
 
@@ -34,7 +34,8 @@ export default class Popup extends Component {
         super();
         this.state = {
             activeIndex: -1,
-            list: []
+            list: [],
+            host: ''
         };
     }
 
@@ -44,11 +45,12 @@ export default class Popup extends Component {
 
     async toggleUser(index, name) {
         const tab = await getPageInfo();
-        const { url, id } = tab;
+        const { url, domain } = tab;
         console.log(index, name, 99);
-        this.state.activeIndex = index;
-        const domain = new URL(url).host;
-        toggleUser({ name, domain, url });
+        this.setState({ activeIndex: index });
+        setTimeout(() => {
+            toggleUser({ name, domain, url });
+        }, 10);
     }
 
     renderEmpty() {
@@ -77,9 +79,10 @@ export default class Popup extends Component {
 
     async componentDidMount() {
         const tab = await getPageInfo();
-        console.log(tab.url, 88, tab.id);
+        const { domain } = tab;
         const users = await storage.get('users');
-        this.setState({ list: obj2Arr(users || {}) });
+        console.log(users, 'users');
+        this.setState({ list: obj2Arr(users || {}), host: domain });
         this.setCookie();
     }
 
@@ -87,20 +90,24 @@ export default class Popup extends Component {
     render() {
         const list = this.state.list.map(({ name, per }, index) => {
             const active = this.state.activeIndex === index;
-            let btn = <Button type="link" onClick={(e) => { e.nativeEvent.stopImmediatePropagation(); this.toggleUser(index, name); }}>切换</Button>;
+            let btn = <Button type="link" onClick={(e) => { e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); this.toggleUser(index, name); }}>切换</Button>;
             btn = active ? React.cloneElement(btn, { disabled: true, className: 'disable' }) : btn;
             return (
                 <Panel
                     key={index}
+                    className={`${active ? 'active' : ''}`}
                     header={(
-                        <>
-                            <Avatar />
-                            {' '}
-                            <span>{name }</span>
-                            <div className="toolbar">
-                                {btn}
+                        <div className={`panel-header-wrapper ${active ? 'active' : ''}`}>
+                            <div className="panel-header">
+                                <Avatar />
+                                {' '}
+                                <span>{name }</span>
+                                <div className="toolbar">
+                                    {btn}
+                                </div>
                             </div>
-                        </>
+                            <RightOutlined className="ant-collapse-btn" />
+                        </div>
                     )}
                 >
                     <h5>拥有的权限：</h5>
@@ -108,17 +115,17 @@ export default class Popup extends Component {
                 </Panel>
             );
         });
-        console.log(list);
         return (
             <div className={`${WRAPPER_CLASS_NAME}`}>
-                <div className="row-1 test">
+                <div className="row-1">
+                    <i className="title" title={this.state.host}>{this.state.host}</i>
                     <Toolbar />
                 </div>
                 {list.length ? (
                     <Collapse className="row-2">
                         {list}
                     </Collapse>
-                ) : <Empty /> }
+                ) : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} /> }
                 <div className="row-3">
                     {list.length ? <Manager /> : <Button type="link" onClick={this.gotoPage}>新建用户</Button>}
                 </div>

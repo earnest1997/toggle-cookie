@@ -1,7 +1,7 @@
 import React from 'react';
 import { render } from 'react-dom';
 import {
-    contentClient, ChromeMessage, listeners
+    contentClient, ChromeMessage, listeners, storage
 } from '../chrome';
 import './ContentScripts.scss';
 import DrawerDemo from './DrawerDemo';

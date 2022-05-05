@@ -1,4 +1,4 @@
-import * as storage from './storage';
+import { storage } from './storage';
 import { parentClient, ChromeMessage } from './message';
 
 function getCookie(url) {
@@ -10,10 +10,8 @@ function getCookie(url) {
 }
 
 function setCookie(val) {
-    console.log(val, 8899);
-    chrome.cookies.set(val, (cookie) => {
-        console.log(JSON.stringify(cookie));
-        console.log(chrome.extension.lastError);
+    chrome.cookies.set(val, () => {
+        console.log('set cookie error', chrome.extension.lastError);
         console.log(chrome.runtime.lastError);
     });
 }
@@ -25,6 +23,7 @@ function removeCookie() {
 async function addData(name, val = true, key = 'users') {
     const users = await storage.get(key) || {};
     users[name] = val;
+    console.log(name, val, 999);
     storage.set(key, users);
 }
 
@@ -49,10 +48,9 @@ async function toggleUser({ name, domain: currentPageDomain, url }) {
             parentCookie.push(item);
         }
     });
-    console.log(parentCookie, 'parentcookie');
-    // if (parentCookie.length) {
-    parentClient.sendMessage(new ChromeMessage('set-parent-cookie', parentCookie));
-    // }
+    if (parentCookie.length) {
+        parentClient.sendMessage(new ChromeMessage('set-parent-cookie', parentCookie));
+    }
 }
 
 export {

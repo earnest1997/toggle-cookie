@@ -70,7 +70,6 @@ function Manager() {
             message.error('无法获取当前用户cookie，请确定是否登录');
             return;
         }
-        console.log(cookie, 99);
         userForm.setFieldsValue({ cookie });
         setCookieStatus(true);
     };

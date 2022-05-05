@@ -19,6 +19,7 @@ module.exports = () => merge(commonConfig, {
         lazy: false,
         // 将 bundle 写到磁盘而不是内存
         writeToDisk: true,
+        // 在其它所有的中间件之前执行自定义的中间件
         before(app) {
             reloadServer(app);
         }
