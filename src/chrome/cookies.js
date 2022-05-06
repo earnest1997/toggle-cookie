@@ -20,17 +20,16 @@ function removeCookie() {
     chrome.cookies.remove();
 }
 
-async function addData(name, val = true, key = 'users') {
-    const users = await storage.get(key) || {};
-    users[name] = val;
-    console.log(name, val, 999);
-    storage.set(key, users);
+async function setData(name, val = true, key = 'users') {
+    const data = await storage.get(key) || {};
+    data[name] = {...(data[name] || {}),...val};
+    storage.set(key, data);
 }
 
 async function removeData(name, key = 'users') {
-    const users = await storage.get(key) || {};
-    delete users[name];
-    storage.set(key, users);
+    const data = await storage.get(key) || {};
+    delete data[name];
+    storage.set(key, data);
 }
 
 async function toggleUser({ name, domain: currentPageDomain, url }) {
@@ -57,7 +56,7 @@ export {
     getCookie,
     setCookie,
     removeCookie,
-    addData,
+    setData,
     removeData,
     toggleUser
 };

@@ -7,7 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const rootDir = path.resolve(__dirname, '..');
-const wrapperClassName = `chrome-extension-base-class${Math.floor(Math.random() * 10000)}`;
+const wrapperClassName = `chrome-extension-base-class-cookie-manager`;
 console.log(wrapperClassName, 99);
 const postCssPlugins = [
     require('autoprefixer'),
