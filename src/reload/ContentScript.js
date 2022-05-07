@@ -1,4 +1,4 @@
-import { contentClient } from '../chrome';
+import { contentClient } from '../chrome/message';
 
 contentClient.listen('refresh page', (res, sendResponse) => {
     sendResponse('received refresh cmd');

@@ -17,5 +17,5 @@ export {
     getBgWindow,
     listeners
 };
-export * from './cookies';
+export * from './data';
 export * from './page';

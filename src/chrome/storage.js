@@ -18,18 +18,20 @@ export const storage = new (class Storage {
     }
   }
 
-  set(key, value) {
+  set(key, value,isSync) {
     return new Promise((resolve) => {
-      chrome.storage.sync.set({ [`${this.siteDomain}-${key}`]: value }, () => {
-        console.log(`${this.siteDomain}-${key}`, 'get');
+      const storageType=isSync ? 'sync':'local'
+      chrome.storage[storageType].set({ [`${this.siteDomain}-${key}`]: value }, () => {
+        console.log(`${this.siteDomain}-${key}`, 'set',value);
         resolve(value);
       });
     });
   }
 
-  get(key) {
+  get(key,isSync) {
     return new Promise((resolve) => {
-      chrome.storage.sync.get(`${this.siteDomain}-${key}`, (result) => {
+      const storageType=isSync ? 'sync':'local'
+      chrome.storage[storageType].get(`${this.siteDomain}-${key}`, (result) => {
         console.log(`${this.siteDomain}-${key}`, 'get');
         resolve(result[`${this.siteDomain}-${key}`] || {});
       });

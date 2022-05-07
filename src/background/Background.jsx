@@ -9,7 +9,8 @@ export default class Background {
 
     init() {
         this.initContentMenu();
-        this.initMessageClient();
+        this.listenSetCookieCmd();
+        this.listenSetPersonalPermissionCmd();
     }
 
     // 初始化右键菜单
@@ -24,12 +25,18 @@ export default class Background {
     }
 
     // 初始化消息通道
-    initMessageClient() {
+    listenSetCookieCmd() {
         contentClient.listen('set-cookie', (res, sendResponse) => {
-            console.log(res, 'res');
             window.currentUserCookie = res.params;
-            window.test = 999;
             sendResponse(new ChromeMessage('set cookie success'));
+        });
+    }
+
+    listenSetPersonalPermissionCmd() {
+        contentClient.listen('get-current-permission', (res, sendResponse) => {
+            console.log(res.params, 'res');
+            window.personalPermission = res.params;
+            sendResponse(new ChromeMessage('set personal permission success'));
         });
     }
 }

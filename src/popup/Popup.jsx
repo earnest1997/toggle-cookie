@@ -20,29 +20,49 @@ import beautifyJson from 'json-beautify';
 
 const { Panel } = Collapse;
 
-function Toolbar() {
+function Toolbar({ setList }) {
   const exportConfig = async () => {
     let jsonConfig = {
-      user: await storage.get('users'),
+      users: await storage.get('users'),
       permission: await storage.get('permission'),
     };
-    jsonConfig=beautifyJson(jsonConfig,null, 2, 80)
+    jsonConfig = beautifyJson(jsonConfig, null, 2, 80);
     const blob = new Blob([jsonConfig], { type: 'application/json' });
     saveAs(blob, 'config.json');
   };
 
-  const importConfig=async()=>{
-  
-  }
+  const saveConfig = (result) => {
+    try {
+      const config = JSON.parse(result);
+      const { users, permission } = config;
+      storage.set('users', users);
+      setList(users);
+      storage.set('permission', permission);
+    } catch (err) {
+      alert(err.message+',不合法的配置文件，请检查');
+    }
+  };
+
+  const onFileChange = (e) => {
+    var myFile = e.target.files[0];
+    var reader = new FileReader();
+    var result;
+    reader.readAsText(myFile);
+    reader.onload = function () {
+      result = reader.result;
+      saveConfig(result);
+    };
+  };
 
   return (
     <div className='toolbar'>
-      <span title='导出配置'>
+      <div title='导出配置'>
         <ExportOutlined onClick={exportConfig} />
-      </span>
-      <span title='导入配置'>
-        <ImportOutlined onClick={importConfig} />
-      </span>
+      </div>
+      <div title='导入配置'>
+        <input type='file' onChange={onFileChange} />
+        <ImportOutlined onClick={e=>e.preventDefault()}/>
+      </div>
     </div>
   );
 }
@@ -78,7 +98,6 @@ export default class Popup extends Component {
   async toggleUser(index, name) {
     const tab = await getPageInfo();
     const { url, domain } = tab;
-    console.log(index, name, 99);
     this.setState({ activeIndex: index });
     setTimeout(() => {
       toggleUser({ name, domain, url });
@@ -93,14 +112,11 @@ export default class Popup extends Component {
     );
   }
 
-  async setCookie() {
-    const tab = await getPageInfo();
-    const { url } = tab;
+  async setCookie(url) {
     const currentUserCookie = await getCookie(url);
     const res = await contentClient.sendMessage(
       new ChromeMessage('set-cookie', currentUserCookie)
     );
-    console.log(currentUserCookie, res, tab);
     // chrome.tabs.query({
     //     currentWindow: true,
     //     active: true
@@ -111,14 +127,26 @@ export default class Popup extends Component {
     // });
   }
 
+  setList(users) {
+    this.setState({ list: obj2Arr(users || {}) });
+  }
+
+  async initData(domain){
+    const users = await storage.get('users');
+    const list=obj2Arr(users || {})
+    this.setState({ list, host: domain });
+    const activeName=await storage.get('activeUser')
+    if(activeName && list.length){
+      const activeIndex=list.findIndex(({name})=>name===activeName)
+      this.setState({activeIndex})
+    }
+  }
+
   async componentDidMount() {
     const tab = await getPageInfo();
-    const { domain } = tab;
-    const users = await storage.get('users');
-    console.log(users, 'users', domain, 88);
-    this.setState({ list: obj2Arr(users || {}), host: domain });
-    this.setCookie();
-    domain = host;
+    const { domain,url } = tab;
+    this.initData(domain)
+    this.setCookie(url);
   }
 
   // eslint-disable-next-line react/require-render-return
@@ -165,7 +193,7 @@ export default class Popup extends Component {
           <i className='title' title={this.state.host}>
             {this.state.host}
           </i>
-          <Toolbar />
+          <Toolbar setList={this.setList.bind(this)} />
         </div>
         {list.length ? (
           <Collapse className='row-2'>{list}</Collapse>
