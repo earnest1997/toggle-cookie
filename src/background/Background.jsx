@@ -8,20 +8,8 @@ export default class Background {
     }
 
     init() {
-        this.initContentMenu();
         this.listenSetCookieCmd();
         this.listenSetPersonalPermissionCmd();
-    }
-
-    // 初始化右键菜单
-    initContentMenu() {
-        create({
-            id: 'demo',
-            title: '演示右键功能',
-            onclick: () => {
-                parentClient.sendMessage(new ChromeMessage('set cookie'));
-            }
-        });
     }
 
     // 初始化消息通道
