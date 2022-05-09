@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "Chrome Extension Boilerplate",
-  "description": "使用 react + antd 开发 chrome-extension 的脚手架工程",
+  "name": "toggle-user",
+  "description": "切换账号",
   "version": "1.0",
 
   "icons": {
