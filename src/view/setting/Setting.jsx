@@ -20,8 +20,8 @@ import './view.scss';
 const { Item: FormItem, useForm } = Form;
 const { Group } = Checkbox;
 const formItemLayout = {
-    labelCol: { span: 4 },
-    wrapperCol: { span: 16 }
+    labelCol: { span: 6 },
+    wrapperCol: { span: 14 }
 };
 const { confirm } = Modal;
 

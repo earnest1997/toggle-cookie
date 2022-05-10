@@ -11,7 +11,6 @@ import './Popup.scss';
 import { saveAs } from 'file-saver';
 import beautifyJson from 'json-beautify';
 import {
-    go,
     storage,
     toggleUser,
     getCookie,
@@ -92,7 +91,7 @@ export default class Popup extends Component {
     }
 
     gotoPage(domain) {
-        go(`../html/view.html?domain=${domain || this.state.host}`);
+        window.open(`../html/view.html?domain=${domain || this.state.host}`);
     }
 
     async toggleUser(index, name) {

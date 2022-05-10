@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "toggle-user",
   "description": "切换账号",
   "version": "1.0",
@@ -17,18 +17,16 @@
     "storage",
     "background",
     "tabCapture",
-    "cookies",
-    "<all_urls>"
+    "cookies"
   ],
 
+  "host_permissions": ["<all_urls>"],
+
   "background": {
-    "persistent": true,
-    "scripts": [
-      "js/background.js"
-    ]
+    "service_worker": "js/background.js"
   },
 
-  "browser_action": {
+  "action": {
     "default_icon": "icons/ic_16.png",
     "default_title": "Extension Popup",
     "default_popup": "html/popup.html"
@@ -44,7 +42,11 @@
   ],
 
   "web_accessible_resources": [
-    "images/*"
+    {
+      "resources": ["images/*"],
+      "matches": ["<all_urls>"],
+      "extension_ids": ["pdeahkmacnpgibballjanicfmnfimoga"]
+    }
   ],
 
   "minimum_chrome_version": "5"

@@ -12,18 +12,24 @@ export default class Background {
         this.listenSetPersonalPermissionCmd();
     }
 
+    getWindow() {
+        return chrome.windows.getCurrent;
+    }
+
     // 初始化消息通道
-    listenSetCookieCmd() {
+    async listenSetCookieCmd() {
+        const currentWindow = await this.getWindow();
         contentClient.listen('set-cookie', (res, sendResponse) => {
-            window.currentUserCookie = res.params;
+            currentWindow.currentUserCookie = res.params;
             sendResponse(new ChromeMessage('set cookie success'));
         });
     }
 
-    listenSetPersonalPermissionCmd() {
+    async listenSetPersonalPermissionCmd() {
+        const currentWindow = await this.getWindow();
         contentClient.listen('get-current-permission', (res, sendResponse) => {
             console.log(res.params, 'res');
-            window.personalPermission = res.params;
+            currentWindow.personalPermission = res.params;
             sendResponse(new ChromeMessage('set personal permission success'));
         });
     }

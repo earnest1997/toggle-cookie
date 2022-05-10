@@ -17,7 +17,7 @@ export default class ContentScripts {
     }
 
     listenSetCookieCmd() {
-        contentClient.listen('set-parent-cookie', (request) => {
+        contentClient.listen('set-parent-cookie', (request, sendResponse) => {
             const { params } = request;
             params.forEach((item) => {
                 const { value, httpOnly, ...obj } = item;
@@ -32,6 +32,7 @@ export default class ContentScripts {
                 );
                 document.cookie = cookie;
             });
+            sendResponse('set parent cookie success');
             window.location.reload();
         });
     }
