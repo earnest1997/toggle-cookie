@@ -3,8 +3,8 @@ import { getPageInfo } from './page';
 
 export const storage = new (class Storage {
     constructor() {
-        this.siteDomain = '';
-        this.init();
+        this.siteDomain = 'kly.kuaichuan.360kuai.com';
+        // this.init();
     }
 
     async init() {
@@ -40,7 +40,7 @@ export const storage = new (class Storage {
         return new Promise((resolve) => {
             const storageType = isSync ? 'sync' : 'local';
             chrome.storage[storageType].get(`${this.siteDomain}-${key}`, (result) => {
-                console.log(`${this.siteDomain}-${key}`, 'get');
+                console.log(`${this.siteDomain}-${key}`, 'get', result[`${this.siteDomain}-${key}`]);
                 resolve(result[`${this.siteDomain}-${key}`] || {});
             });
         });

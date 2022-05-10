@@ -21,8 +21,11 @@
         text-shadow: none;
         box-shadow: none;
       }
-    }
 
+    }
+    .ant-form-item .ant-form-item{
+      margin-bottom: 0!important;
+    }
   main {
     padding: 30px;
   }
@@ -42,6 +45,16 @@
         }
       }
     }
+  }
+
+  .tips{
+    color:rgba(0, 0, 0, 0.6);
+    font: size 12px;padding-left: 10px;
+  }
+
+  .no-permission{
+    word-break: keep-all;
+    white-space: nowrap;
   }
 
 

@@ -9,7 +9,8 @@ export default class ContentScripts {
     }
 
     async init() {
-    // 注意，必须设置了run_at=document_start 此段代码才会生效
+        this.setHeartBeat();
+        // 注意，必须设置了run_at=document_start 此段代码才会生效
         document.addEventListener('DOMContentLoaded', () => {
             this.listenSetCookieCmd();
             this.sendUserPermission();
@@ -43,14 +44,18 @@ export default class ContentScripts {
         htmlContent = htmlContent.innerHTML;
         const reg = /(?<=privilege:)(.*)/;
         let permissions = htmlContent.match(reg);
-        console.log(permissions, 'permis');
         if (permissions) {
             permissions = permissions[0].split(',');
             const personalPers = permissions
                 .filter((item) => item in kuaichuanPermissionConf)
                 .map((item) => ({ name: kuaichuanPermissionConf[item] }));
-            console.log(personalPers, 'pers');
             contentClient.sendMessage(new ChromeMessage('get-current-permission', personalPers));
         }
+    }
+
+    setHeartBeat() {
+        setTimeout(() => {
+            contentClient.sendMessage('ping');
+        }, 10);
     }
 }

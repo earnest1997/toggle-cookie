@@ -1,5 +1,5 @@
 import {
-    create, parentClient, ChromeMessage, contentClient
+    parentClient, ChromeMessage, contentClient, storage
 } from '../chrome';
 
 export default class Background {
@@ -9,6 +9,7 @@ export default class Background {
 
     init() {
         this.listenSetCookieCmd();
+        this.listenPing();
         this.listenSetPersonalPermissionCmd();
     }
 
@@ -16,20 +17,23 @@ export default class Background {
         return chrome.windows.getCurrent;
     }
 
-    // 初始化消息通道
     async listenSetCookieCmd() {
-        const currentWindow = await this.getWindow();
-        contentClient.listen('set-cookie', (res, sendResponse) => {
-            currentWindow.currentUserCookie = res.params;
+        contentClient.listen('set-cookie', async (res, sendResponse) => {
+            // currentWindow.currentUserCookie = res.params;
+            await storage.set('currentUserCookie', res.params, true);
             sendResponse(new ChromeMessage('set cookie success'));
         });
     }
 
+    listenPing() {
+        parentClient.listen('ping', ((res, sendResponse) => {
+            sendResponse('pong');
+        }));
+    }
+
     async listenSetPersonalPermissionCmd() {
-        const currentWindow = await this.getWindow();
-        contentClient.listen('get-current-permission', (res, sendResponse) => {
-            console.log(res.params, 'res');
-            currentWindow.personalPermission = res.params;
+        contentClient.listen('get-current-permission', async (res, sendResponse) => {
+            await storage.set('personalPermission', res.params, true);
             sendResponse(new ChromeMessage('set personal permission success'));
         });
     }

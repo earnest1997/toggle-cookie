@@ -13,15 +13,15 @@ import {
     message
 } from 'antd';
 import {
-    storage, setData, getBgWindow, removeData
+    storage, setData, removeData
 } from '../../chrome';
 import './view.scss';
 
 const { Item: FormItem, useForm } = Form;
 const { Group } = Checkbox;
 const formItemLayout = {
-    labelCol: { span: 6 },
-    wrapperCol: { span: 14 }
+    labelCol: { span: 4 },
+    wrapperCol: { span: 16 }
 };
 const { confirm } = Modal;
 
@@ -119,8 +119,8 @@ function Manager() {
         }
     ].map((item) => ({ ...item, align: 'center' }));
 
-    const getCurrentUserPermission = () => {
-        const { personalPermission } = getBgWindow();
+    const getCurrentUserPermission = async () => {
+        const personalPermission = await storage.get('personalPermission', true);
         console.log(personalPermission, 88);
         if (personalPermission) {
             setPrivatePers(personalPermission);
@@ -174,8 +174,8 @@ function Manager() {
         });
     };
 
-    const importCookie = () => {
-        const cookie = getBgWindow().currentUserCookie;
+    const importCookie = async () => {
+        const cookie = await storage.get('currentUserCookie', true);
         if (!cookie) {
             message.error('无法获取当前用户cookie，请确定是否登录');
             return;
@@ -251,10 +251,9 @@ function Manager() {
                         <FormItem label="账号" name="account">
                             <Input />
                         </FormItem>
-                        <FormItem label="权限（仅可编辑手动创建的权限）">
-                            <Button size="small" onClick={getCurrentUserPermission}>导入(/更新)当前用户权限</Button>
-                            <span>（仅适用于快传号）</span>
-                            <FormItem name="pers">
+                        <FormItem label="权限">
+                            <Button size="small" onClick={getCurrentUserPermission} type="primary">导入(/更新)当前用户权限</Button>
+                            <FormItem name="pers" className="pers-wrapper">
                                 {(pers.length || privatePers.length) ? (
                                     <Group>
                                         {[...pers, ...privatePers].map(({ name }, index) => (
@@ -264,7 +263,7 @@ function Manager() {
                                         ))}
                                     </Group>
                                 ) : (
-                                    '暂无手动创建的权限，请新建'
+                                    <span className="no-permission">暂无手动创建的权限，请新建</span>
                                 )}
                             </FormItem>
                         </FormItem>
@@ -289,6 +288,10 @@ function Manager() {
                             </FormItem>
                         )}
                     </Form>
+                    <ul className="tips">
+                        <li>* 注：权限仅可编辑手动创建的权限 *</li>
+                        <li>* 自动导入权限仅适用于快传号 *</li>
+                    </ul>
                 </Modal>
 
                 <Modal
