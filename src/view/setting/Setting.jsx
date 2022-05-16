@@ -158,8 +158,8 @@ function Manager() {
                 newList.splice(index, 1, formData);
                 return newList;
             });
-            const { name, ...rest } = formData;
-            setData(name, rest);
+            const { name: username, ...rest } = formData;
+            setData(username, rest);
             closeModal();
         });
     };
