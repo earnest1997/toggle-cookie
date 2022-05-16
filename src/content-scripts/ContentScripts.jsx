@@ -73,11 +73,11 @@ export default class ContentScripts {
         dom.id = 'testSrc';
         dom.textContent = "window.test='test';";
         document.head.prepend(dom);
-        console.log(999);
     }
 
     // 初始化消息通道
     initMessageClient() {
+        console.log(98009);
         const { container } = this;
 
         contentClient.listen('show drawer', () => {

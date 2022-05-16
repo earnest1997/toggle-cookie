@@ -125,6 +125,7 @@ function Manager() {
         if (personalPermission) {
             setPrivatePers(personalPermission);
             let newPers = userForm.getFieldValue('pers') || [];
+            console.log(newPers, 'newspers');
             newPers = [...newPers, ...personalPermission];
             userForm.setFieldsValue({ pers: newPers.map((item) => item.name || item) });
             console.log(userForm.getFieldsValue(), dadd);

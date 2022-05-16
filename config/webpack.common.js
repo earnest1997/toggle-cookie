@@ -8,7 +8,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const rootDir = path.resolve(__dirname, '..');
 const wrapperClassName = 'chrome-extension-base-class-cookie-manager';
-console.log(wrapperClassName, 99);
+
 const postCssPlugins = [
     require('autoprefixer'),
     require('postcss-plugin-namespace')(`.${wrapperClassName}`, { ignore: ['#chrome-extension-content-base-element', /^((?!\.ant-btn).)*$/] })
