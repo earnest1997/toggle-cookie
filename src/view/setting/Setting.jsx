@@ -2,7 +2,6 @@ import React, {
     useState, useEffect, cloneElement, useMemo
 } from 'react';
 import {
-    Card,
     Table,
     Radio,
     Button,
@@ -23,7 +22,6 @@ const formItemLayout = {
     labelCol: { span: 4 },
     wrapperCol: { span: 16 }
 };
-const { confirm } = Modal;
 
 function Manager() {
     const [activeTab, setActiveTab] = useState('user');
@@ -53,21 +51,8 @@ function Manager() {
     const delUser = async (username) => {
         await removeData(username);
         setList();
-    // confirm({
-    //   wrapClassName:WRAPPER_CLASS_NAME,
-    //   className:`${WRAPPER_CLASS_NAME} op-modal`,
-    //   centered:true,
-    //   icon: <ExclamationCircleOutlined style={{color:'#f77f00'}}/>,
-    //   content: <p style={{marginBottom:'10px'}}>确定删除该帐号？</p>,
-    //   onOk: () => {
-    //       window.alert(99)
-    //     removeData(username);
-    //     setList();
-    //   },
-    // });
     };
     const editUser = (rowData) => {
-        console.log(rowData);
         userForm.setFieldsValue({ ...rowData });
         setModalVisible('editUser');
     };
