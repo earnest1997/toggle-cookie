@@ -39,6 +39,7 @@ export default class ContentScripts {
                 );
                 document.cookie = cookie;
             });
+            console.log(998);
             sendResponse('set parent cookie success');
             window.location.reload();
         });

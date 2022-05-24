@@ -43,12 +43,13 @@ async function toggleUser({ name, domain: currentPageDomain, url }) {
         const { domain } = item;
         item.url = url;
         const isParentDomain = domain !== currentPageDomain;
-        if (isParentDomain) {
+        if (!isParentDomain) {
             setCookie(item);
         } else {
             parentCookie.push(item);
         }
     });
+    console.log(parentCookie, 'cnm');
     if (parentCookie.length) {
         parentClient.sendMessage(new ChromeMessage('set-parent-cookie', parentCookie));
     }
