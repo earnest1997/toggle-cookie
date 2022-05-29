@@ -8,7 +8,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const rootDir = path.resolve(__dirname, '..');
 const wrapperClassName = 'chrome-extension-base-class-cookie-manager';
-console.log(wrapperClassName, 99);
+
 const postCssPlugins = [
     require('autoprefixer'),
     require('postcss-plugin-namespace')(`.${wrapperClassName}`, { ignore: ['#chrome-extension-content-base-element', /^((?!\.ant-btn).)*$/] })
@@ -19,7 +19,7 @@ module.exports = {
         popup: './src/popup',
         background: './src/background',
         contentScripts: './src/content-scripts',
-        demo: './src/view/setting'
+        view: './src/view/setting'
     },
     output: {
         path: path.resolve(rootDir, './dist/js'),
@@ -187,7 +187,7 @@ module.exports = {
         new HtmlWebpackPlugin({
             template: path.resolve(rootDir, 'public/html/view.html'),
             filename: path.resolve(rootDir, 'dist/html/view.html'),
-            chunks: ['demo']
+            chunks: ['view']
         }),
         new webpack.DefinePlugin({
             WRAPPER_CLASS_NAME: `'${wrapperClassName}'` // 防止插件的样式被污染或者是当前页面的样式污染插件的样式

@@ -9,7 +9,7 @@ module.exports = () => merge(commonConfig, {
         popup: './src/popup',
         background: ['./src/background', './src/reload/Background'],
         contentScripts: ['./src/content-scripts', './src/reload/ContentScript'],
-        demo: './src/view/setting'
+        view: './src/view/setting'
     },
     devtool: 'source-map',
     plugins: [

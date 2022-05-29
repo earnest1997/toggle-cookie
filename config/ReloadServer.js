@@ -3,6 +3,7 @@ const ChromeReloadPlugin = require('./plugins/CompilerEmitPlugin');
 
 function ReloadServer(app) {
     app.get('/reload', (req, res, next) => {
+        console.log('cccdkeowpodkwpoekdopwekdewpokkdwpdkkddkkd');
         const sseStream = new SSEStream(req);
         const compiler = ChromeReloadPlugin.innerCompiler;
         sseStream.pipe(res);

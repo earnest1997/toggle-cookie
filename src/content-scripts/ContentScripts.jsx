@@ -1,5 +1,8 @@
+import React from 'react';
+import { render } from 'react-dom';
 import { contentClient, ChromeMessage } from '../chrome/message';
 import { kuaichuanPermissionConf } from './config';
+import DrawerDemo from './DrawerDemo';
 import './ContentScripts.scss';
 
 export default class ContentScripts {
@@ -14,6 +17,9 @@ export default class ContentScripts {
         document.addEventListener('DOMContentLoaded', () => {
             this.listenSetCookieCmd();
             this.sendUserPermission();
+
+            this.initContainer();
+            this.initMessageClient();
         });
     }
 
@@ -33,6 +39,7 @@ export default class ContentScripts {
                 );
                 document.cookie = cookie;
             });
+            console.log(998);
             sendResponse('set parent cookie success');
             window.location.reload();
         });
@@ -44,18 +51,65 @@ export default class ContentScripts {
         htmlContent = htmlContent.innerHTML;
         const reg = /(?<=privilege:)(.*)/;
         let permissions = htmlContent.match(reg);
+        let personalPers = [];
         if (permissions) {
             permissions = permissions[0].split(',');
-            const personalPers = permissions
+            personalPers = permissions
                 .filter((item) => item in kuaichuanPermissionConf)
                 .map((item) => ({ name: kuaichuanPermissionConf[item] }));
-            contentClient.sendMessage(new ChromeMessage('get-current-permission', personalPers));
         }
+
+        console.log(personalPers, 9);
+        contentClient.sendMessage(new ChromeMessage('get-current-permission', personalPers));
     }
 
     setHeartBeat() {
         setTimeout(() => {
             contentClient.sendMessage('ping');
         }, 10);
+    }
+
+    setWindowVar() {
+        const dom = document.createElement('script');
+        dom.id = 'testSrc';
+        dom.textContent = "window.test='test';";
+        document.head.prepend(dom);
+    }
+
+    // 初始化消息通道
+    initMessageClient() {
+        console.log(98009);
+        const { container } = this;
+
+        contentClient.listen('show drawer', () => {
+            this.showContainer();
+
+            render(
+                <DrawerDemo onClose={() => { this.hideContainer(); }} />,
+                container
+            );
+        });
+    }
+
+    // 初始化外层包裹元素
+    initContainer() {
+        const { document } = window;
+        const base = document.querySelector('#chrome-extension-content-base-element');
+        if (base) {
+            this.container = base;
+        } else {
+            this.container = document.createElement('div');
+            this.container.setAttribute('id', 'chrome-extension-content-base-element');
+            this.container.setAttribute('class', WRAPPER_CLASS_NAME);
+            document.body.appendChild(this.container);
+        }
+    }
+
+    showContainer() {
+        this.container.setAttribute('style', 'display: block');
+    }
+
+    hideContainer() {
+        this.container.setAttribute('style', 'display: none');
     }
 }
