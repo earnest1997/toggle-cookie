@@ -251,9 +251,8 @@ function Manager() {
                         <FormItem label="账号" name="account">
                             <Input />
                         </FormItem>
-                        <FormItem label="权限（仅可编辑手动创建的权限）">
+                        <FormItem label="权限">
                             <Button size="small" onClick={getCurrentUserPermission}>导入(/更新)当前用户权限</Button>
-                            <span>（仅适用于快传号）</span>
                             <FormItem name="pers">
                                 {(pers.length || privatePers.length) ? (
                                     <Group>
@@ -289,6 +288,10 @@ function Manager() {
                             </FormItem>
                         )}
                     </Form>
+                    <ul className="tips">
+                        <li>* 注：权限仅可编辑手动创建的权限 *</li>
+                        <li>* 自动导入权限仅适用于快传号 *</li>
+                    </ul>
                 </Modal>
 
                 <Modal
