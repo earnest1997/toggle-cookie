@@ -134,6 +134,7 @@ export default class Popup extends Component {
     async initData(domain) {
         const users = await storage.get('users');
         const list = obj2Arr(users || {});
+        console.log(users, 'users');
         this.setState({ list, host: domain });
         // const activeName = await storage.get('activeUser');
         // if (activeName && list.length) {
@@ -151,7 +152,7 @@ export default class Popup extends Component {
 
     // eslint-disable-next-line react/require-render-return
     render() {
-        const list = this.state.list.map(({ name, per }, index) => {
+        const list = this.state.list.map(({ name, pers }, index) => {
             const active = this.state.activeIndex === index;
             let btn = (
                 <Button
@@ -185,7 +186,7 @@ export default class Popup extends Component {
                     )}
                 >
                     <h5>拥有的权限：</h5>
-                    <p>{per ? per.join(',') : '暂未配置权限'}</p>
+                    <p>{pers ? pers.join(',') : '暂未配置权限'}</p>
                 </Panel>
             );
         });

@@ -125,7 +125,7 @@ function Manager() {
         if (personalPermission) {
             setPrivatePers(personalPermission);
             let newPers = userForm.getFieldValue('pers') || [];
-            newPers = [...newPers, ...personalPermission];
+            newPers = [...new Set([...newPers, ...personalPermission])];
             userForm.setFieldsValue({ pers: newPers.map((item) => item.name || item) });
             console.log(userForm.getFieldsValue(), dadd);
         }
@@ -142,9 +142,9 @@ function Manager() {
         await userForm.validateFields().then(() => {
             const formData = userForm.getFieldsValue();
             console.log(formData, 'cnm');
-            const { name, ...rest } = formData;
+            const { name: username, ...rest } = formData;
             setUsers((prev) => [...prev, formData]);
-            setData(name, rest);
+            setData(username, rest);
             closeModal();
         });
     };
@@ -168,7 +168,7 @@ function Manager() {
         persForm.validateFields().then(() => {
             const formData = persForm.getFieldsValue();
             const { name, ...rest } = formData;
-            setPers((prev) => [...prev, formData]);
+            setPers((prev) => [...new Set([...prev, formData])]);
             setData(name, rest, 'permission');
             closeModal();
         });

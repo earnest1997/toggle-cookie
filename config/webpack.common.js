@@ -162,7 +162,7 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: '../css/[name].css'
         }),
-        new CleanWebpackPlugin(),
+        new CleanWebpackPlugin({ dangerouslyAllowCleanPatternsOutsideProject: false }),
         new CopyWebpackPlugin({
             patterns: [
                 {

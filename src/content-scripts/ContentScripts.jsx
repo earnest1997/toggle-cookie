@@ -11,6 +11,7 @@ export default class ContentScripts {
     async init() {
     // 注意，必须设置了run_at=document_start 此段代码才会生效
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('init');
             this.listenSetCookieCmd();
             this.sendUserPermission();
         });
@@ -20,19 +21,17 @@ export default class ContentScripts {
         contentClient.listen('set-parent-cookie', (request) => {
             const { params } = request;
             params.forEach((item) => {
-                const { value, httpOnly, ...obj } = item;
-                const cookie = Object.entries(obj || {}).reduce(
-                    (prev, [key, val]) => {
-                        if (key === 'name') {
-                            return `${prev}${val}=${value};`;
-                        }
-                        return `${prev}${key}=${val};`;
-                    },
-                    ''
-                );
-                document.cookie = cookie;
+                const {
+                    value, domain, name
+                } = item;
+                const now = new Date();
+                const time = now.getTime();
+                const expireTime = time + 1000 * 36000;
+                now.setTime(expireTime);
+                console.log(params, 9, `${name}=${value};domain=${domain};httpOnly=false;expires=${now.toUTCString()};secure=false;`);
+                document.cookie = `${name}=${value};domain=${domain};expires=${now.toUTCString()}`;
             });
-            window.location.reload();
+            // window.location.reload();
         });
     }
 
