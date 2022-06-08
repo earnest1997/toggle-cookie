@@ -26,12 +26,13 @@ export default class ContentScripts {
                 } = item;
                 const now = new Date();
                 const time = now.getTime();
-                const expireTime = time + 1000 * 36000 * 60;
+                const expireTime = time + 1000 * 36000 * 1000;
                 now.setTime(expireTime);
                 // 如果之前的cookie没有清除的话 这样设置 expires可能会被之前的覆盖
                 document.cookie = `${name}=${value};domain=${domain};expires=${now.toUTCString()}`;
+                console.log(`${name}=${value};domain=${domain};expires=${now.toUTCString()}`, 'cooki');
             });
-            window.location.reload();
+            // window.location.reload();
         });
     }
 
