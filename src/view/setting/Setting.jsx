@@ -41,6 +41,8 @@ function Manager() {
     );
 
     const setList = async () => {
+        const { random } = getBgWindow();
+        console.log(random, 'kl');
         const user = await storage.get('users');
         const permission = await storage.get('permission');
         if (user) {
@@ -158,8 +160,8 @@ function Manager() {
                 newList.splice(index, 1, formData);
                 return newList;
             });
-            const { name, ...rest } = formData;
-            setData(name, rest);
+            const { name: username, ...rest } = formData;
+            setData(username, rest);
             closeModal();
         });
     };
@@ -176,6 +178,7 @@ function Manager() {
 
     const importCookie = () => {
         const cookie = getBgWindow().currentUserCookie;
+        console.log(cookie, 'cookie');
         if (!cookie) {
             message.error('无法获取当前用户cookie，请确定是否登录');
             return;

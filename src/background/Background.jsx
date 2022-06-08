@@ -15,7 +15,9 @@ export default class Background {
     // 初始化消息通道
     listenSetCookieCmd() {
         contentClient.listen('set-cookie', (res, sendResponse) => {
+            console.log('seteted');
             window.currentUserCookie = res.params;
+            window.random = Math.random();
             sendResponse(new ChromeMessage('set cookie success'));
         });
     }

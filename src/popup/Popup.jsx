@@ -114,17 +114,9 @@ export default class Popup extends Component {
 
     async setCookie(url) {
         const currentUserCookie = await getCookie(url);
-        const res = await contentClient.sendMessage(
+        await contentClient.sendMessage(
             new ChromeMessage('set-cookie', currentUserCookie)
         );
-        // chrome.tabs.query({
-        //     currentWindow: true,
-        //     active: true
-        // }, async (tabs) => {
-        //     console.log(tabs, 88);
-        //     const tab = tabs[0];
-
-    // });
     }
 
     setList(users) {

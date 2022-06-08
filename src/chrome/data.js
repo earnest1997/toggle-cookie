@@ -40,8 +40,9 @@ async function toggleUser({ name, domain: currentPageDomain, url }) {
     const parentCookie = [];
     storage.set('activeUser', name);
     cookie.forEach(({ hostOnly, session, ...item }) => {
-        const { domain } = item;
+        const { domain, name } = item;
         item.url = url;
+        chrome.cookies.remove({ url, name });
         const isParentDomain = domain !== currentPageDomain;
         if (!isParentDomain) {
             setCookie(item);
